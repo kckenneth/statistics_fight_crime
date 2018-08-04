@@ -349,7 +349,6 @@ Call:
  gvlma(x = model1) 
  ```
  
- 
 | Assumption | Value | p-value | Decision |
 |--------------------|--------------:|-------------:|---------------------------:|
 |Global Stat	| 20.8513239	| 3.389018e-04	| Assumptions NOT satisfied! |
@@ -371,10 +370,14 @@ boxout = boxplot(crime_cleaned$crmrte, varwidth = T, outline = T, border = T, pl
 boxout$out
 ```
 <p align="center">
-<img src="img/model1.png" width="600"></p>
-<p align="center">Figure 4. The first base model 1</p>
+<img src="img/boxplot1.png" width="600"></p>
+<p align="center">Figure 5. Boxplot and outliers</p>
 
-Boxplot shows that there are 6 outliers in crmrte that would have influenced our regression model. 
+```
+0.0883849 0.0790163 0.0989659 0.0834982 0.0729479
+```
+
+Boxplot shows that there are 5 outliers in crmrte that would have influenced our regression model. 
 
 # Model 2
 
@@ -386,7 +389,11 @@ model2 = lm(crmrte ~ sqrt(density) + taxpc, data=crime_83)
 par(mfrow=c(2,2))
 plot(model2)
 ```
-You now notice that after removing 6 outliers, there's no observations closer to Cook's distance. This will reduces biases in our regression model. 
+<p align="center">
+<img src="img/model2.png" width="600"></p>
+<p align="center">Figure 6. Model 2 with outliers removed</p>
+
+You now notice that after removing 5 outliers, there's no observations closer to Cook's distance. This will reduces biases in our regression model. 
 
 ## Assumption 5 : Omitted Variable Bias
 
@@ -398,6 +405,10 @@ table2 = cbind(crime_83[3], sqrt(crime_83[9]), crime_83[10], crime_83[25])
 chart.Correlation(table2, histogram = TRUE, pch=19)
 ```
 
+<p align="center">
+<img src="img/table2.png" width="600"></p>
+<p align="center">Figure 7. Correlation Matrix with 3 explanatory variables</p>
+
 # Model 3
 
 ```{r}
@@ -407,6 +418,32 @@ summary(model3)
 par(mfrow=c(2,2))
 plot(model3)
 ```
+```
+Call:
+lm(formula = crmrte ~ sqrt(density) + taxpc + pctymle, data = crime_83)
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-0.0149544 -0.0067494 -0.0006957  0.0040228  0.0201478 
+
+Coefficients:
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   -0.0128792  0.0059792  -2.154 0.034287 *  
+sqrt(density)  0.0207617  0.0024374   8.518 8.51e-13 ***
+taxpc          0.0002299  0.0001188   1.934 0.056641 .  
+pctymle        0.1532323  0.0424431   3.610 0.000535 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.008849 on 79 degrees of freedom
+Multiple R-squared:  0.5771,	Adjusted R-squared:  0.5611 
+F-statistic: 35.94 on 3 and 79 DF,  p-value: 9.418e-15
+```
+
+<p align="center">
+<img src="img/model3.png" width="600"></p>
+<p align="center">Figure 8. Essential plots for Model 3</p>
+
 You would notice that the distribution of residuals become normal in 1st plot. Scale-location plot also shows a homoscedasticity of the residual variance. There is one observation `30` lying closer to Cook's distance. This sample is also an outlier in `QQ plot`.  
 
 # Model 4
@@ -428,6 +465,38 @@ plot(model4)
 gvlma(model4)
 ```
 
+```
+Residual standard error: 0.007815 on 74 degrees of freedom
+Multiple R-squared:  0.6371,	Adjusted R-squared:  0.6077 
+F-statistic: 21.65 on 6 and 74 DF,  p-value: 1.593e-14
+
+
+Call:
+lm(formula = crmrte ~ sqrt(density) + taxpc + pctymle + factor(west) + 
+    factor(central) + factor(urban), data = crime_81)
+
+Coefficients:
+     (Intercept)     sqrt(density)             taxpc           pctymle  
+      -0.0016371         0.0223412         0.0001208         0.1034380  
+   factor(west)1  factor(central)1    factor(urban)1  
+      -0.0100001        -0.0065651         0.0039072  
+
+
+ASSESSMENT OF THE LINEAR MODEL ASSUMPTIONS
+USING THE GLOBAL TEST ON 4 DEGREES-OF-FREEDOM:
+Level of Significance =  0.05 
+
+Call:
+ gvlma(x = model4) 
+ ```
+
+| Assumption | Value | p-value | Decision |
+|--------------------|--------------:|-------------:|---------------------------:|
+|Global Stat	| 2.75871150	| 0.5989806	| Assumptions acceptable. |
+|Skewness	| 1.97484766	| 0.1599342	|Assumptions acceptable. |
+|Kurtosis	| 0.05326972	| 0.8174684	| Assumptions acceptable. |
+|Link Function	| 0.64766157	| 0.4209500	| Assumptions acceptable. |
+|Heteroscedasticity	| 0.08293255	| 0.7733620	|Assumptions acceptable. |
 
 We observed that our model becomes more in tune with classical assumptions for linear regression. 
 
@@ -445,6 +514,60 @@ plot(model5)
 gvlma(model5)
 ```
 
+```
+Call:
+lm(formula = crmrte ~ sqrt(density) + taxpc + pctymle + pctmin80 + 
+    factor(west) + factor(central) + factor(urban), data = crime_81)
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-0.0143574 -0.0049366 -0.0008309  0.0045232  0.0177253 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      -1.264e-02  7.217e-03  -1.751  0.08414 .  
+sqrt(density)     2.462e-02  3.065e-03   8.031 1.23e-11 ***
+taxpc             1.333e-04  1.069e-04   1.247  0.21637    
+pctymle           1.126e-01  3.853e-02   2.923  0.00461 ** 
+pctmin80          2.010e-04  7.744e-05   2.595  0.01141 *  
+factor(west)1    -3.721e-03  3.212e-03  -1.158  0.25052    
+factor(central)1 -4.235e-03  2.337e-03  -1.812  0.07411 .  
+factor(urban)1    1.358e-03  5.510e-03   0.246  0.80602    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.007529 on 73 degrees of freedom
+Multiple R-squared:  0.6678,	Adjusted R-squared:  0.6359 
+F-statistic: 20.96 on 7 and 73 DF,  p-value: 3.49e-15
+
+
+Call:
+lm(formula = crmrte ~ sqrt(density) + taxpc + pctymle + pctmin80 + 
+    factor(west) + factor(central) + factor(urban), data = crime_81)
+
+Coefficients:
+     (Intercept)     sqrt(density)             taxpc           pctymle  
+      -0.0126379         0.0246194         0.0001333         0.1126188  
+        pctmin80     factor(west)1  factor(central)1    factor(urban)1  
+       0.0002010        -0.0037209        -0.0042347         0.0013581  
+
+
+ASSESSMENT OF THE LINEAR MODEL ASSUMPTIONS
+USING THE GLOBAL TEST ON 4 DEGREES-OF-FREEDOM:
+Level of Significance =  0.05 
+
+Call:
+ gvlma(x = model5)
+ ```
+ 
+```
+Global Stat	2.5446103	0.6366658	Assumptions acceptable.	
+Skewness	0.9625682	0.3265407	Assumptions acceptable.	
+Kurtosis	0.2539941	0.6142766	Assumptions acceptable.	
+Link Function	0.3476697	0.5554353	Assumptions acceptable.	
+Heteroscedasticity	0.9803783	0.3221054	Assumptions acceptable.
+```
+	
 # Model 6
 
 ```{r}
@@ -457,6 +580,39 @@ par(mfrow=c(2,2))
 plot(model5)
 
 gvlma(model6)
+```
+
+```
+F-statistic:  17.7 on 10 and 70 DF,  p-value: 1.548e-15
+
+
+Call:
+lm(formula = crmrte ~ prbarr + prbconv + polpc + sqrt(density) + 
+    taxpc + pctymle + pctmin80 + factor(west) + factor(central) + 
+    factor(urban), data = crime_81)
+
+Coefficients:
+     (Intercept)            prbarr           prbconv             polpc  
+       7.519e-03        -2.479e-02        -1.131e-04         2.342e+00  
+   sqrt(density)             taxpc           pctymle          pctmin80  
+       2.140e-02        -1.683e-06         6.353e-02         2.543e-04  
+   factor(west)1  factor(central)1    factor(urban)1  
+      -3.421e-03        -3.934e-03         3.562e-04  
+
+
+ASSESSMENT OF THE LINEAR MODEL ASSUMPTIONS
+USING THE GLOBAL TEST ON 4 DEGREES-OF-FREEDOM:
+Level of Significance =  0.05 
+
+Call:
+ gvlma(x = model6) 
+ ```
+ ```
+Global Stat	1.9030325	0.7535879	Assumptions acceptable.	
+Skewness	0.1105759	0.7394894	Assumptions acceptable.	
+Kurtosis	0.5279075	0.4674879	Assumptions acceptable.	
+Link Function	0.1247535	0.7239351	Assumptions acceptable.	
+Heteroscedasticity	1.1397956	0.2856955	Assumptions acceptable.	
 ```
 
 # Akaike Test : Goodness of Fit Vs Parsimony 
@@ -472,6 +628,15 @@ AIC(model5)
 AIC(model6)
 ```
 
+```
+[1] -537.2417
+[1] -532.6429
+[1] -543.3181
+[1] -547.4314
+[1] -552.581
+[1] -559.4527
+```
+
 You now realize that our last model gives us the better AIC value while we are not employing all the variables available in our data. 
 
 ```{r}
@@ -482,11 +647,44 @@ stargazer(model1, model2, model3, model4, model5, model6, type = "text",
           omit.table.layout = "n") # Omit more output related to errors
 ```
 
+```
+Linear Models Predicting Crime Rates in NC
+============================================================
+                             Dependent variable:            
+                 -------------------------------------------
+                                   crmrte                   
+                  (1)    (2)    (3)    (4)    (5)     (6)   
+------------------------------------------------------------
+prbarr                                               -0.025 
+                                                            
+prbconv                                             -0.0001 
+                                                            
+polpc                                                2.342  
+                                                            
+sqrt(density)    0.027  0.022  0.021  0.022  0.025   0.021  
+                                                            
+taxpc            0.0001 0.0002 0.0002 0.0001 0.0001 -0.00000
+                                                            
+pctymle                        0.153  0.103  0.113   0.064  
+                                                            
+pctmin80                                     0.0002  0.0003 
+                                                            
+factor(west)1                         -0.010 -0.004  -0.003 
+                                                            
+factor(central)1                      -0.007 -0.004  -0.004 
+                                                            
+factor(urban)1                        0.004  0.001   0.0004 
+                                                            
+Constant         -0.002 0.001  -0.013 -0.002 -0.013  0.008  
+                                                            
+------------------------------------------------------------
+Observations       89     83     83     81     81      81   
+R2               0.616  0.507  0.577  0.637  0.668   0.717  
+Adjusted R2      0.607  0.495  0.561  0.608  0.636   0.676  
+============================================================
+```
 
-\hfill\break
-
-\newpage
-# Testing Model 5
+# Testing Model 5 (Optional Learning)
 
 $\widehat{\text{crmrte}} = \beta_0 + \beta_1 \cdot \text{sqrt(density)} + \beta_2 \cdot \text{taxpc} + \beta_3 \cdot \text{pctymle} + \beta_4 \cdot \text{pctmin80} + \beta_5 \cdot \text{west} + \beta_6 \cdot \text{central} + \beta_7 \cdot \text{urban}$  
 
@@ -522,7 +720,6 @@ rmse(actual = crime_81$crmrte, predicted = prediction4)
 rmse(actual = crime_81$crmrte, predicted = prediction5)
 rmse(actual = crime_81$crmrte, predicted = prediction6)
 ```
-
 
 # Conclusion
 
