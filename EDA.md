@@ -74,6 +74,23 @@ apply(!is.na(crime), MARGIN=2,  mean)
 colSums(is.na(crime))
 ```
 
+```
+ county      year    crmrte    prbarr   prbconv   prbpris    avgsen     polpc 
+0.9381443 0.9381443 0.9381443 0.9381443 1.0000000 0.9381443 0.9381443 0.9381443 
+  density     taxpc      west   central     urban  pctmin80      wcon      wtuc 
+0.9381443 0.9381443 0.9381443 0.9381443 0.9381443 0.9381443 0.9381443 0.9381443 
+     wtrd      wfir      wser      wmfg      wfed      wsta      wloc       mix 
+0.9381443 0.9381443 0.9381443 0.9381443 0.9381443 0.9381443 0.9381443 0.9381443 
+  pctymle 
+0.9381443 
+  county     year   crmrte   prbarr  prbconv  prbpris   avgsen    polpc  density 
+       6        6        6        6        0        6        6        6        6 
+   taxpc     west  central    urban pctmin80     wcon     wtuc     wtrd     wfir 
+       6        6        6        6        6        6        6        6        6 
+    wser     wmfg     wfed     wsta     wloc      mix  pctymle 
+       6        6        6        6        6        6        6 
+ ```
+ 
 \hfill\break
 We also need to check if all 97 observations in `prbconv` is a real value or any of the special characters. As a control, we included other variables as well.
 \hfill\break
@@ -112,6 +129,9 @@ png("corrplot.png", width = 500, height = 500)
 corrplot(cor(crime_cleaned[3:25]))
 ```
 
+<p align="center">
+<img src="img/before_kafka.png" width="600"></p>
+<p align="center">Figure 1. Data Communications</p>
 
 ```{r}
 png("corrmatrix.png", width = 500, height = 500)
