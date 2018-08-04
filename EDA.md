@@ -140,7 +140,7 @@ corrplot(cor(crime_cleaned[3:25]))
 
 <p align="center">
 <img src="img/corrplot.png" width="600"></p>
-<p align="center">Figure 1. Data Communications</p>
+<p align="center">Figure 1. Correlation plot in Heat Map</p>
 
 ```{r}
 png("corrmatrix.png", width = 500, height = 500)
@@ -148,7 +148,7 @@ chart.Correlation(crime_cleaned[3:25], histogram = TRUE, pch=19)
 ```
 <p align="center">
 <img src="img/corrmatrix.png" width="600"></p>
-<p align="center">Figure 1. Data Communications</p>
+<p align="center">Figure 2. Correlation Matirx with Histogram and ScatterPlot</p>
 
 ## Positive Correlation 
 
@@ -205,7 +205,7 @@ chart.Correlation(table1, histogram = TRUE, pch=19)
 ```
 <p align="center">
 <img src="img/table1.png" width="600"></p>
-<p align="center">Figure 1. Data Communications</p>
+<p align="center">Figure 3. Correlation Matrix with two explanatory variables</p>
 
 # Model 1
 ```{r}
@@ -243,7 +243,7 @@ plot(model1)
 ```
 <p align="center">
 <img src="img/model1.png" width="600"></p>
-<p align="center">Figure 1. Data Communications</p>
+<p align="center">Figure 4. The first base model 1</p>
 
 # Checking the violation of assumptions in classical linear regression
 
@@ -264,6 +264,8 @@ Since the expected value of residuals or sum is infinitesimally small, our assum
 
 The first model shows that our residuals are clustered based on the first plot `Residuals Vs Fitted`. QQ plot also shows that the residuals are not normally distributed and there are a few observations such as an observation `25` has a high influence or leverage on our regression model as it goes beyond the Cook's distance. This can also be seen in our prior scatterplot in which we can see that there are a few outliers in `pctymle` variable. As a practice, I continue checking all other assumptions before we modify our base model. 
 
+### Pearson's correlation 
+
 ```{r}
 # Checking the assumption in OLS
 # Checking if there's any correlation between independent variable and the residuals
@@ -271,6 +273,30 @@ cor.test(sqrt(crime_89$density), model1$residuals)
 cor.test(crime_89$taxpc, model1$residuals)
 ```
 
+```
+	Pearson's product-moment correlation
+
+data:  sqrt(crime_89$density) and model1$residuals
+t = 2.6664e-16, df = 87, p-value = 1
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.2082567  0.2082567
+sample estimates:
+        cor 
+2.85868e-17 
+
+
+	Pearson's product-moment correlation
+
+data:  crime_89$taxpc and model1$residuals
+t = 6.0595e-17, df = 87, p-value = 1
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.2082567  0.2082567
+sample estimates:
+        cor 
+6.49645e-18 
+```
 The correlation test shows that there is no correlation between our explanatory variables and the dependent variable: `crmrte`. Their p-value is 1 and 1 respectively. So we fail to reject our null hypothesis which is no correlation between the explanatory variables and the dependent variable. 
 
 ## Assumption 2 : Homoscedasticity 
@@ -280,12 +306,21 @@ var(sqrt(crime_cleaned$density))
 var(crime_cleaned$taxpc)
 ```
 
+```
+[1] 0.2524518
+[1] 171.9203
+```
 We also see that the variance of the explanatory variable `sqrt(density)` has low variance, which satisfies our homoscedasticity. However the variance of the other variable `pctymle` is high, further confirming our previous observation that there are a few outliers in `pctymle` variable. 
 
 ## Assumption 3 : No Multicollinearity between explanatory variables
 
 ```{r}
 vif(model1)
+```
+
+```
+sqrt(density)         taxpc 
+     1.205425      1.205425 
 ```
 
 As a general rule of thumb, VIF (Variance Inflation Factor) should be lower than 4. The higher the VIF, the more correlation between each explanatory variables. As I mentioned earlier on, we started off with a selection of variables that do not have a correlation between each other. So our `vif()` test again confirms our choice here and satisfies our assumption. 
@@ -296,6 +331,35 @@ As a general rule of thumb, VIF (Variance Inflation Factor) should be lower than
 library(gvlma)
 gvlma(model1)
 ```
+
+```
+Call:
+lm(formula = crmrte ~ sqrt(density) + taxpc, data = crime_89)
+
+Coefficients:
+  (Intercept)  sqrt(density)          taxpc  
+   -0.0021107      0.0273720      0.0001392  
+
+
+ASSESSMENT OF THE LINEAR MODEL ASSUMPTIONS
+USING THE GLOBAL TEST ON 4 DEGREES-OF-FREEDOM:
+Level of Significance =  0.05 
+
+Call:
+ gvlma(x = model1) 
+ ```
+ 
+ ```
+  
+| Assumption | Value | p-value | Decision |
+|--------------------|--------------:|-------------:|---------------------------:|
+|Global Stat	| 20.8513239	| 3.389018e-04	| Assumptions NOT satisfied! |
+|Skewness	| 17.0464288	| 3.647691e-05	|Assumptions NOT satisfied! |
+|Kurtosis	| 2.9969395	| 8.342197e-02	| Assumptions acceptable. |
+|Link Function	| 0.5555872	| 4.560437e-01	| Assumptions acceptable. |
+|Heteroscedasticity	| 0.2523685	| 6.154123e-01	|Assumptions acceptable. |
+```
+
 We see that there are a few assumptions violated in our model, presumably due to the choice of our explanatory variable in the beginning. 
 
 ## More Data Cleaning
@@ -307,6 +371,9 @@ par(mfrow=c(1,2))
 boxout = boxplot(crime_cleaned$crmrte, varwidth = T, outline = T, border = T, plot = T, boxwex = .25)
 boxout$out
 ```
+<p align="center">
+<img src="img/model1.png" width="600"></p>
+<p align="center">Figure 4. The first base model 1</p>
 
 Boxplot shows that there are 6 outliers in crmrte that would have influenced our regression model. 
 
