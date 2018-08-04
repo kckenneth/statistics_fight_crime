@@ -90,20 +90,29 @@ colSums(is.na(crime))
     wser     wmfg     wfed     wsta     wloc      mix  pctymle 
        6        6        6        6        6        6        6 
  ```
- 
-\hfill\break
+
+
 We also need to check if all 97 observations in `prbconv` is a real value or any of the special characters. As a control, we included other variables as well.
-\hfill\break
+
+
 ```{r}
 # Checking special characters such as 'a white space' etc 
 (apply(crime[1:25], MARGIN=2, FUN=function(x) sum(x %in% c("`", "", "?", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")"))))
+```
+
+```
+  county     year   crmrte   prbarr  prbconv  prbpris   avgsen    polpc  density 
+       0        0        0        0        6        0        0        0        0 
+   taxpc     west  central    urban pctmin80     wcon     wtuc     wtrd     wfir 
+       0        0        0        0        0        0        0        0        0 
+    wser     wmfg     wfed     wsta     wloc      mix  pctymle 
+       0        0        0        0        0        0        0 
 ```
 
 As you can see, we found that there are **`6`** special characters in `prbconv` variable, which left me with 91 observations from 97. The rest of the variables do not contain special characters. Further check upon `prbconv` shows that the variable contains **`5`** white space and a special character `backtick`, **`**. 
 
 Before we continue the analysis, I removed all empty rows. I also checked if there is any duplicate observations in our sample by `distinct()` function. Since there are variables with probability, I removed any samples with probability greater than 1 or percentage greater than 100 to avoid erroraneous recordings in crime data, which led to remove one additional row that has a `prbarr` greater than 1. The data now has 90 rows. Lastly, I changed the variable type into `numeric` for developing our model. 
 
-\hfill\break
 ```{r}
 # So 97 observations end up at 91 observations. 
 crime_full = crime[complete.cases(crime), ]
@@ -130,13 +139,16 @@ corrplot(cor(crime_cleaned[3:25]))
 ```
 
 <p align="center">
-<img src="img/before_kafka.png" width="600"></p>
+<img src="img/corrplot.png" width="600"></p>
 <p align="center">Figure 1. Data Communications</p>
 
 ```{r}
 png("corrmatrix.png", width = 500, height = 500)
 chart.Correlation(crime_cleaned[3:25], histogram = TRUE, pch=19)
 ```
+<p align="center">
+<img src="img/corrmatrix.png" width="600"></p>
+<p align="center">Figure 1. Data Communications</p>
 
 ## Positive Correlation 
 
@@ -191,7 +203,10 @@ png("table1.png", width = 500, height = 500)
 table1 = cbind(crime_cleaned[3], sqrt(crime_cleaned[9]), crime_cleaned[10])
 chart.Correlation(table1, histogram = TRUE, pch=19)
 ```
-\hfill\break 
+<p align="center">
+<img src="img/table1.png" width="600"></p>
+<p align="center">Figure 1. Data Communications</p>
+
 # Model 1
 ```{r}
 # Since there's an outlier in taxpc at 120, we remove the extreme outlier
@@ -200,11 +215,35 @@ crime_89 = crime_cleaned[!(crime_cleaned$taxpc > 100),]
 model1 = lm(crmrte ~ sqrt(density) + taxpc, data=crime_89)
 summary(model1)
 ```
+```
+Call:
+lm(formula = crmrte ~ sqrt(density) + taxpc, data = crime_89)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.016150 -0.008611 -0.002867  0.007539  0.036917 
+
+Coefficients:
+                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   -0.0021107  0.0048579  -0.434    0.665    
+sqrt(density)  0.0273720  0.0026733  10.239   <2e-16 ***
+taxpc          0.0001392  0.0001365   1.020    0.311    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.01151 on 86 degrees of freedom
+Multiple R-squared:  0.6161,	Adjusted R-squared:  0.6072 
+F-statistic: 69.01 on 2 and 86 DF,  p-value: < 2.2e-16
+```
+
 ```{r}
 png("model1.png", width = 500, height = 500)
 par(mfrow=c(2,2))
 plot(model1)
 ```
+<p align="center">
+<img src="img/model1.png" width="600"></p>
+<p align="center">Figure 1. Data Communications</p>
 
 # Checking the violation of assumptions in classical linear regression
 
@@ -214,6 +253,11 @@ $E(\epsilon) = 0$ or $\sum \epsilon = 0$
 ```{r}
 mean(model1$residuals)
 sum(model1$residuals)
+```
+
+```
+[1] -2.018413e-19
+[1] -1.799776e-17
 ```
 
 Since the expected value of residuals or sum is infinitesimally small, our assumption is satisfied. But we do not know if our model also satisifes other assumptions. I will explore more from the 4 plots above. 
