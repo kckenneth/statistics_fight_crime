@@ -349,8 +349,7 @@ Call:
  gvlma(x = model1) 
  ```
  
- ```
-  
+ 
 | Assumption | Value | p-value | Decision |
 |--------------------|--------------:|-------------:|---------------------------:|
 |Global Stat	| 20.8513239	| 3.389018e-04	| Assumptions NOT satisfied! |
@@ -358,7 +357,7 @@ Call:
 |Kurtosis	| 2.9969395	| 8.342197e-02	| Assumptions acceptable. |
 |Link Function	| 0.5555872	| 4.560437e-01	| Assumptions acceptable. |
 |Heteroscedasticity	| 0.2523685	| 6.154123e-01	|Assumptions acceptable. |
-```
+
 
 We see that there are a few assumptions violated in our model, presumably due to the choice of our explanatory variable in the beginning. 
 
